@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "django-react-boilerplate.fullname" . }}
+  labels:
+    app: {{ include "django-react-boilerplate.fullname" . }}
+    {{- include "django-react-boilerplate.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ include "django-react-boilerplate.fullname" . }}
+      {{- include "django-react-boilerplate.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app: {{ include "django-react-boilerplate.fullname" . }}
+        {{- include "django-react-boilerplate.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "django-react-boilerplate.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: {{ .Values.service.name }}
+              containerPort: {{ .Values.image.containerPort }}
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: django-react-boilerplate-secret
+                  key: POSTGRES_PASSWORD
+            - name: DJANGO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: django-react-boilerplate-secret
+                  key: DJANGO_SECRET_KEY
+            - name: GOOGLE_OAUTH_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: django-react-boilerplate-secret
+                  key: GOOGLE_OAUTH_CLIENT_ID
+            - name: GOOGLE_OAUTH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: django-react-boilerplate-secret
+                  key: GOOGLE_OAUTH_CLIENT_SECRET
+            - name: JWT_SIGNING_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: django-react-boilerplate-secret
+                  key: JWT_SIGNING_KEY
+            - name: SFDC_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: django-react-boilerplate-secret
+                  key: SFDC_USERNAME
+            - name: SFDC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: django-react-boilerplate-secret
+                  key: SFDC_PASSWORD
+            - name: SFDC_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: django-react-boilerplate-secret
+                  key: SFDC_TOKEN
+            - name: DJANGO_ENVIRONMENT_STAGE
+              valueFrom:
+                secretKeyRef:
+                  name: django-react-boilerplate-secret
+                  key: DJANGO_ENVIRONMENT_STAGE
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

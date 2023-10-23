@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "django-react-boilerplate.fullname" . }}-service
+  labels:
+    {{- include "django-react-boilerplate.labels" . | nindent 4 }}
+  annotations:
+    consul.hashicorp.com/service-sync: 'true'
+    consul.hashicorp.com/service-meta-service_type: STANDALONE
+    consul.hashicorp.com/service-meta-has_api: 'false'
+    consul.hashicorp.com/service-meta-billing-team: revops
+
+    consul.hashicorp.com/service-port: http
+    consul.hashicorp.com/service-name: {{ .Values.service.consul_name }}
+    consul.hashicorp.com/service-tags: django-react-boilerplate-service,register-cname
+
+    consul.hashicorp.com/healthcheck-curlopts: '2'
+    consul.hashicorp.com/healthcheck-interval: '2'
+    consul.hashicorp.com/healthcheck-response: .*"status".*"ok".*
+    consul.hashicorp.com/healthcheck-timeout: '2'
+    consul.hashicorp.com/leader-election-single-node: 'true'
+spec:
+  selector:
+    app: {{ include "django-react-boilerplate.fullname" . }}
+  type: {{ .Values.service.type }}
+  ports:
+    - name: {{ .Values.service.name }}
+      protocol: {{ .Values.service.protocol }}
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
