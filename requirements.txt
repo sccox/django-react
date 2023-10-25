@@ -11,4 +11,3 @@ django-cors-headers==3.13.0
 dj-rest-auth==2.2.5
 djangorestframework-simplejwt==5.2.1
 python-dotenv
-simple-salesforce

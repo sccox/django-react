@@ -70,21 +70,6 @@ spec:
                 secretKeyRef:
                   name: django-react-boilerplate-secret
                   key: JWT_SIGNING_KEY
-            - name: SFDC_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: django-react-boilerplate-secret
-                  key: SFDC_USERNAME
-            - name: SFDC_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: django-react-boilerplate-secret
-                  key: SFDC_PASSWORD
-            - name: SFDC_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: django-react-boilerplate-secret
-                  key: SFDC_TOKEN
             - name: DJANGO_ENVIRONMENT_STAGE
               valueFrom:
                 secretKeyRef:
